@@ -1,22 +1,24 @@
 # the bells..
 # sonic pi tune
+# this emulates the changes in bellringing from a 12345678, using 'plain hunt' changes, which swap adjacent bells except 1st & last, then swaps all adjacent pairs, then continues until it gets back to the start.
+# stuff behind a '#' is a comment, by the way
 
 $bells = 8 # number of bells used
-$bellPitch = Array[60, 59, 57, 55, 53, 52, 50, 48]
-$startPeal = Array(1..$bells)
-$peal = $startPeal # holds current order of bells
-$vol = 1
+$bellPitch = Array[60, 59, 57, 55, 53, 52, 50, 48] # descending scale...add more notes if you add more bells...
+$startPeal = Array(1..$bells) # starts off 12345678
+$peal = $startPeal # holds current order of bells which changes
+$vol = 1 # how loud it plays. 1 is normal. 
 puts "#{$peal}" # 'puts' shows current value of array
 use_bpm 120
 
-define :hunt do # this swaps adjacent bells except 1st & last
+define :hunt do # this function swaps adjacent bells except 1st & last
   i = 0
   until i >= $bells
     i += 1
     if i%2 == 0
       k = i -1
-      val = $peal.delete_at(i)
-      $peal.insert(k, val)
+      val = $peal.delete_at(i) # removes alternate bells
+      $peal.insert(k, val) # & puts them one place before
     end
   end
   $peal.compact!
@@ -38,12 +40,12 @@ define :huntxx do # this swaps all pairs of bells
   puts "#{$peal}"
 end
 
-define :playBell do |b|
+define :playBell do |b| # plays a single bell
   use_synth :dull_bell # probably can find a better sound for this
   play b, amp: $vol
 end
 
-define :playRing do # plays 8 bells in current order
+define :playRing do # plays 8 bells in current order, calling playBell function each time
   $bells.times do |i|
     place = $peal.at(i)
     pitch = $bellPitch.at(place-1)
