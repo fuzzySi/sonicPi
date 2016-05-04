@@ -58,8 +58,8 @@ end
 
 8.times do # start of actual playing loop
   playRing
-  hunt
-  playRing
   huntxx
+  playRing
+  hunt
 end
 playRing
