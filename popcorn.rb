@@ -1,4 +1,5 @@
-# popcorn by Gershon Kingsley
+# Popcorn by Gershon Kingsley
+# needs sonicPi v3 ('get' & 'set' appear in v3)
 set :tempo, 240
 set :transpose, 2
 
