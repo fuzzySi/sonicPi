@@ -1,7 +1,7 @@
 # test to parse a lilypond file & play it
 # lilypond is an opensource format used to layout sheet music (similar to latex)
 # 8 means semiquavers, durations persist until changed
-# comma goes down an octave, (based around note A) ' goes up 1 octave. r means a rest.
+# comma goes down an octave, (based around note A) ' goes up 1 octave. r means a rest. 
 
 lily = "c8 b c g, ef g c r | c' b c g, ef g c r| c' d ef d ef c d c d b c g, ef g c4 " # ensure space at end
 # other lilypond stuff such as bars: '|' is ignored
