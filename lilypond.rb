@@ -1,21 +1,26 @@
 # test to parse a lilypond file & play it
+# lilypond is an opensource format used to layout sheet music (similar to latex)
+# 8 means semiquavers, durations persist until changed
+# comma goes down an octave, (based around note A) ' goes up 1 octave. r means a rest.
 
-lily = "r4 ef2 d's16 | cs8 a b'4. a8 g,s e,f | r4 e'2 ds4 | cs8 a b4. a8 gs e" # example lilypond format
-notes = ""
-currentNote = ""
-number = ""
-numbers = ""
-restBool = false
-duration = 1
-dotted = 1 # multiplier for dotted note durations
-currentOctave = 57 # a3
-newNote = false
+lily = "c8 b c g, ef g c r | c' b c g, ef g c r| c' d ef d ef c d c d b c g, ef g c4 " # ensure space at end
+# other lilypond stuff such as bars: '|' is ignored
 
+currentOctave = 57 # a3 is 57. change this to start at lower octave, or transpose
+
+notes = Array.new       # output array of notes
+durations = Array.new   # output of note durations
+
+# sets up working variables
+currentNote = "", number = "", numbers = ""
+restBool = false, newNote = false
+duration = 1, dotted = 1 # multiplier for dotted note durations
+
+# parses lily file and works out which are notes
 lily.split('').each do|c|
   asc = c.ord # ascii code for letter
-  # puts c
   if newNote==false and asc >96 and asc < 104
-    currentNote = asc - 97 # + currentOctave # char a=97, -97=0, +57 to get midi note a3
+    currentNote = asc - 97 # note 'a' converted to note 0
     # now to map ascii to MIDI notes - make up for the black keys
     if currentNote > 5
       currentNote += 4 # g is 4 notes above a
@@ -28,7 +33,6 @@ lily.split('').each do|c|
     end
     if currentNote
       newNote = true
-      # puts "new Note"
     end
   end
   if newNote == false and asc == 114 then # rest
@@ -55,6 +59,7 @@ lily.split('').each do|c|
     number = asc - 48 # 48 is zero, gets back to the number value
     duration = 0 # reset duration, as it's a new value
     numbers << number.to_s # add to string containing number - allows double digit values
+    dotted = 1.0 # new duration, so not dotted any more
   end
   if asc == 46 then # dotted
     dotted = 1.5
@@ -62,27 +67,38 @@ lily.split('').each do|c|
   if asc == 32 then # space, means end of this note
     if duration == 0
       duration = 4.0 / numbers.to_i * dotted
+      numbers = "" # tidy up
     end
     if newNote == true or restBool == true then
       if newNote == true then
         currentNote += currentOctave
-        puts "note: " + currentNote.to_s # use to_s to convert to string for puts
+        # puts "note: " + currentNote.to_s   #uncomment for testing
+        notes.push(currentNote)
       end
       if restBool == true then
-        puts "rest: "
+        #  puts "rest: "
+        notes.push(0)
       end
-      puts "duration " + duration.to_s
+      #puts "duration " + duration.to_s
+      durations.push(duration)
       newNote = false
       restBool = false
       currentNote = ""
     end
-    if asc == 32
-      numbers = ""
-      dotted = 1
-    end
   end
 end
 
-#if c =~ /[a-gA-G]/ # if letter between a & g, upper or lower case
-# =~ /\d/ # if is a number
+# testing
+# notes.each do|n|
+#  puts n
+#end
 
+live_loop :popcorn do
+  use_bpm 160
+  for i in 0..notes.length-1
+    if notes[i] != 0 then # don't play a rest (recorded as note 0)
+      play notes[i],sustain: durations[i]*0.5,release: durations[i]*0.2
+    end
+    sleep durations[i]
+  end
+end
