@@ -13,20 +13,6 @@ lily = "c4. c8 d2 c f e r c4. c8 d2 c g f2 r c4. c8 c'2 a f, e4. e8 d2 r2 b'f4. 
 
 currentOctave = 57 # a3 is 57. change this to start at lower octave, or transpose
 
-notes, durations = lily_to_midi lily
-# this calls function & reads notes from 'lily' into 'notes' & 'durations', use other names to read multiple files
-
-live_loop :popcorn do
-  use_bpm 160
-  for i in 0..notes.length-1
-    if notes[i] != 128 then # don't play a rest (stored as note 128, which is outside MIDI notes range)
-      play notes[i],sustain: durations[i]*0.5,release: durations[i]*0.2
-    end
-    sleep durations[i]
-  end
-end
-
-
 define :lily_to_midi do |input|
   # sets up working variables
   currentNote = "", number = "", numbers = ""
@@ -77,7 +63,7 @@ define :lily_to_midi do |input|
     if asc > 48 and asc < 58 then     # it's a number, ignore zeros
       number = asc - 48 # 48 is zero, gets back to the number value
       duration = 0 # reset duration, as it's a new value
-      numbers << number.to_s # add to string containing number - allows double digit values
+      numbers += number.to_s # add to string containing number - allows double digit values
       dotted = 1.0 # new duration, so not dotted any more
     end
     if asc == 46 then # dotted
@@ -107,4 +93,17 @@ define :lily_to_midi do |input|
     end
   end
   return n, d
+end
+
+notes, durations = lily_to_midi lily
+# this calls function & reads notes from 'lily' into 'notes' & 'durations', use other names to read multiple files
+
+live_loop :popcorn do
+  use_bpm 160
+  for i in 0..notes.length-1
+    if notes[i] != 128 then # don't play a rest (stored as note 128, which is outside MIDI notes range)
+      play notes[i],sustain: durations[i]*0.5,release: durations[i]*0.2
+    end
+    sleep durations[i]
+  end
 end
