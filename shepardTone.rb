@@ -35,7 +35,7 @@ live_loop :scale do
         k = k - len
       end
       # puts notes[k], vols[k], (k.fdiv(len)* 2)-1
-      play notes[k], amp: vols[k], attack: 1, release: 0.75, pan: (k.fdiv(len)* 2)-1
+      play notes[k], amp: vols[k], attack: 1, release: 1.5-i.fdiv(len), pan: (k.fdiv(len)* 2)-1 #, cutoff: (k * 50 / len) + 50
       sleep (0.5 / layers)
     end
   end
