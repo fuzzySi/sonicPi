@@ -1,11 +1,10 @@
 # Shephard tone
 
 tempo = 120
-maxAmp = 1
-layers = 6
-use_synth :pretty_bell
-notes = chord:c3, 'm9+5',  num_octaves: 4
-
+maxAmp = 0.5
+layers = 5
+use_synth :sine
+notes = chord:c3, :m,  num_octaves: 4
 
 len = notes.length
 vols = []
@@ -26,6 +25,7 @@ for i in (len - fade)...(len)
   vols[i] = incr * (len - i)
 end
 
+
 live_loop :scale do
   use_bpm tempo
   for i in 0...len
@@ -34,9 +34,9 @@ live_loop :scale do
       if k >= len then
         k = k - len
       end
-      puts notes[k], vols[k], (k.fdiv(len)* 2)-1
-      play notes[k], amp: vols[k], attack: 0.5, release: 1.5, pan: (k.fdiv(len)* 2)-1
+      # puts notes[k], vols[k], (k.fdiv(len)* 2)-1
+      play notes[k], amp: vols[k], attack: 1, release: 0.75, pan: (k.fdiv(len)* 2)-1 #, cutoff: (k * 50 / len) + 50
+      sleep (0.5 / layers)
     end
-    sleep 0.5
   end
 end
